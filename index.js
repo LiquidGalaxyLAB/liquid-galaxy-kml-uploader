@@ -1,24 +1,30 @@
 const express = require("express")
 const lgKML = express.Router()
 
-/**********************************************
-get and set KML into the Liquid Galaxy
-***********************************************/
 lgKML.get('/kml/',function(){
   console.log("lel")
 })
-lgKML.get('/kml/list',function(req,res){
+
+/***
+* KML Builder endpoits
+****/
+lgKML.get('/kml/Builder/addplacemark',function(req,res){
 
 })
-lgKML.get('/kml/getkml/:id',function(req,res){
+lgKML.get('/kml/Builder/buildtour',function(req,res){
 
 })
-lgKML.get('/kml/uploadkml/',function(req,res){
-  
+lgKML.get('/kml/Builder/addpoint/:tourName',function(req,res){
+
 })
 lgKML.get('/kml/setKML/:kml',function(req,res){
 
 })
+
+
+/****
+* the endpoint to sync the kml
+****/
 lgKML.get('/kml/viewsync',function(req,res){
 
 })
