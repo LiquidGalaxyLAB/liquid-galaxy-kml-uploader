@@ -47,8 +47,8 @@ lgKML.get('/kml/Builder/addplacemark',function(req,res){
   //   '</Point>'
   // '</Placemark>'
 })
-lgKML.get('/kml/Builder/buildtour',function(req,res){
-
+lgKML.post('/kml/Builder/Createtour',function(req,res){
+  console.log(req.params())
 })
 lgKML.get('/kml/Builder/addpoint/:tourName',function(req,res){
 
