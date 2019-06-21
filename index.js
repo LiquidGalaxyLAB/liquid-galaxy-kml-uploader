@@ -86,7 +86,7 @@ lgKML.get('/kml/manage/delete/:id',function(req,res){
 })
 lgKML.get('/kml/manage/update',function(req,res){
   checkFolder().then(() => {
-    console.log("kmlpetition")
+    console.log(kmlList[0])
   })
 
 })
@@ -103,7 +103,10 @@ lgKML.get('/kml/upload/',function(req,res){
 * the endpoint to sync the kml
 ****/
 lgKML.get('/kml/viewsync',function(req,res){
-  res.send("send")
+  res.setHeader('Content-Type', 'text/xml')
+  console.log(kmlList[currentKml].path)
+  res.sendFile(kmlList[currentKml].path)
+  console.log("asking for kml")
 })
 
 
