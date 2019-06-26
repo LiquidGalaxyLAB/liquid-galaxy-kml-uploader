@@ -6,7 +6,7 @@ var fs = require('fs');
 
 
 var kmlList = []
-var currentKml;
+var currentKml = 0;
 
 function checkFolder(){
   kmlList = []
@@ -53,18 +53,16 @@ lgKML.post('/kml/Builder/Createtour',function(req,res){
 lgKML.get('/kml/Builder/addpoint/:tourName',function(req,res){
 
 })
-lgKML.get('/kml/setKML/:idKml',function(req,res){
-
-})
-
 /***
 * KML Manage endpoints
 ****/
 lgKML.get('/kml/manage/current',function(req,res){
-  return currentKml
+  res.send(currentKml)
 })
 lgKML.get('/kml/manage/change/:id',function(req,res){
-
+  console.log(req.params)
+  currentKml = req.params.id
+  res.send("okay!")
 })
 lgKML.get('/kml/manage/list',function(req,res){
   res.send(kmlList)
@@ -87,8 +85,9 @@ lgKML.get('/kml/manage/delete/:id',function(req,res){
 lgKML.get('/kml/manage/update',function(req,res){
   checkFolder().then(() => {
     console.log(kmlList[0])
+    res.send(kmlList)	
   })
-
+	
 })
 /****
 *

@@ -38,3 +38,37 @@ Finally you just need to set the IP of your machine into the KML with the networ
 ```xml
 http://IP/kml/viewsync
 ```
+
+## Manage KML's
+
+This endpoint is the one that will be called from the liquid galaxy, to get the kml throw the Network Link.
+```js
+lgKML.get('/kml/viewsync')
+```
+
+The update endpoint return the list of KML's available in the sistem  
+```js
+lgKML.get('kml/manage/update')
+```
+
+Delete a kml by id
+```js
+lgKML.get('/kml/manage/delete/:id')
+```
+
+Return the current kml
+```js
+lgKML.get('/kml/manage/current')
+```
+
+## Create KML's
+
+Create a tour
+```js
+lgKML.post('/kml/Builder/Createtour')
+```
+
+Add a placemark into a tour
+```js
+lgKML.get('/kml/Builder/addpoint/:tourName')
+```
