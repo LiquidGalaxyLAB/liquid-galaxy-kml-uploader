@@ -1,10 +1,10 @@
 const express = require("express")
 const lgKML = express.Router()
 var path = require('path');
-const kmlDir = path.join(require('os').homedir(),'/kmlApi');
+const kmlDir = path.join(require('os').homedir(),'/kmlApi/');
 var fs = require('fs');
-var kmlWriter = require('kmlWriter')
-const kml = kmlWriter()
+var kmlWriter = require('kmlwriter')
+const kml = new kmlWriter()
 
 var kmlList = []
 var currentKml = 0;
@@ -14,7 +14,7 @@ var currentKml = 0;
 * KML Builder endpoits
 ****/
 lgKML.post('/kml/builder/addplacemark',function(req,res){
-
+  console.log(req.query)
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
   console.log(req.params())
@@ -27,6 +27,14 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 /***
 * KML Manage endpoints
 ****/
+lgKML.post('/kml/manage/new',function(req,res){
+  kml.startKml(req.query.name)
+  kml.createPolygon("pe","pe")
+  console.log(kmlDir)
+  kml.saveKML(kmlDir)
+  res.send("created")
+})
+
 lgKML.get('/kml/manage/current',function(req,res){
   res.send(currentKml)
 })
