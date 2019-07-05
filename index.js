@@ -5,9 +5,15 @@ const kmlDir = path.join(require('os').homedir(),'/kmlApi/');
 var fs = require('fs');
 var kmlWriter = require('kmlwriter')
 const kml = new kmlWriter()
-
 var kmlList = []
 var currentKml = 0;
+var exec = require('child_process').exec;
+var bodyParser = require('body-parser')
+lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
+lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
+
 
 
 /***
@@ -88,9 +94,18 @@ lgKML.get('/kml/viewsync',function(req,res){
   console.log("asking for kml")
 })
 
+/***
+* exec the scripts
+***/
+
+lgKML.get('/system/:exec',function(req,res){
+    console.log(req.params)
+    exec(req.params.exec, function(error, stdout, stderr){
+        res.send(stdout);
+    });
+})
 
 //suport functions
-
 function checkFolder(){
   kmlList = []
   return new Promise ((resolve,reject) => {
