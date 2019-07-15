@@ -9,10 +9,13 @@ var kmlList = []
 var currentKml = 0;
 var exec = require('child_process').exec;
 var bodyParser = require('body-parser')
+const formidableMiddleware = require('express-formidable');
+lgKML.use(formidableMiddleware());
 lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
+// lgKML.use(bodyParser() );
 
 
 
@@ -20,7 +23,8 @@ lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 * KML Builder endpoits
 ****/
 lgKML.post('/kml/builder/addplacemark',function(req,res){
-  console.log(req.query)
+  console.log(req.fields)
+  res.send("hello")
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
   console.log(req.params())
@@ -29,14 +33,11 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 
 })
 
-
 /***
 * KML Manage endpoints
 ****/
 lgKML.post('/kml/manage/new',function(req,res){
   kml.startKml(req.query.name)
-  kml.createPolygon("pe","pe")
-  console.log(kmlDir)
   kml.saveKML(kmlDir)
   res.send("created")
 })
@@ -54,7 +55,6 @@ lgKML.put('/kml/manage/:id',function(req,res){
 })
 lgKML.put('/kml/manage',function(req,res){
   checkFolder().then(() => {
-    console.log(kmlList[0])
     res.send(kmlList)
   })
 
@@ -78,7 +78,20 @@ lgKML.delete('/kml/manage/:id',function(req,res){
 /****
 *
 ****/
-lgKML.get('/kml/upload/',function(req,res){
+lgKML.post('/kml/manage/upload/',function(req,res){
+  	if (req.files) {
+    filePath = path.join(kmlDir, req.fields.name + '.kml');
+		fs.writeFile(filePath, req.files.kml, function(err,data){
+      if(err){
+        res.send("error")
+      }else{
+        checkFolder().then(() => {
+          res.send(kmlList)
+        })
+
+      }
+    });
+	}
 
 })
 
@@ -89,9 +102,7 @@ lgKML.get('/kml/upload/',function(req,res){
 ****/
 lgKML.get('/kml/viewsync',function(req,res){
   res.setHeader('Content-Type', 'text/xml')
-  console.log(kmlList[currentKml].path)
   res.sendFile(kmlList[currentKml].path)
-  console.log("asking for kml")
 })
 
 /***
@@ -119,7 +130,6 @@ function checkFolder(){
   })
 }
 function addKML(kml){
-  console.log(kml)
   kmlList.push({
     'id'    : kmlList.length,
     'name'  : kml.split(".js")[0],

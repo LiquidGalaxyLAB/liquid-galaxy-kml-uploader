@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Build from './views/Build.vue'
+import Manage from './views/Manage.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -23,6 +24,11 @@ export default new Router({
       path: '/build',
       name: 'build',
       component: Build
+    },
+    {
+      path: '/manage',
+      name: 'manage',
+      component: Manage
     }
 
 
