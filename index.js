@@ -10,11 +10,17 @@ var currentKml = 0;
 var exec = require('child_process').exec;
 var bodyParser = require('body-parser')
 const formidableMiddleware = require('express-formidable');
+
 lgKML.use(formidableMiddleware());
 lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
+lgKML.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 // lgKML.use(bodyParser() );
 
 
@@ -22,9 +28,23 @@ lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 /***
 * KML Builder endpoits
 ****/
+
+/****
+*  params  id,name,lon,lat,range, altMode = 'relativeToGround', description = '', icon= ''
+****/
 lgKML.post('/kml/builder/addplacemark',function(req,res){
-  console.log(req.fields)
-  res.send("hello")
+  data = req.fields
+  console.log(data)
+  kml.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range)
+  console.log(kml.kml.Folder)
+  console.log(kmlDir)
+  kml.saveKML(kmlDir)
+    .then(() =>{
+      res.send(true)
+    })
+    .catch(()=>{
+      res.send(false)
+    })
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
   console.log(req.params())
@@ -33,13 +53,20 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 
 })
 
+lgKML.post('/kml/builder/addPhoto',function(req,res){
+  console.log(req)
+})
+
 /***
 * KML Manage endpoints
 ****/
 lgKML.post('/kml/manage/new',function(req,res){
-  kml.startKml(req.query.name)
+  console.log(req.fields.name)
+  kml.startKml(req.fields.name)
   kml.saveKML(kmlDir)
-  res.send("created")
+  checkFolder().then(() => {
+    res.send(kmlList)
+  })
 })
 
 lgKML.get('/kml/manage/current',function(req,res){
@@ -101,6 +128,7 @@ lgKML.post('/kml/manage/upload/',function(req,res){
 * the endpoint to sync the kml
 ****/
 lgKML.get('/kml/viewsync',function(req,res){
+  console.log("request!")
   res.setHeader('Content-Type', 'text/xml')
   res.sendFile(kmlList[currentKml].path)
 })

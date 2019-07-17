@@ -1,6 +1,7 @@
 <template>
   <v-app>
-    <v-toolbar app>
+    <v-toolbar dark app>
+      <v-btn to="/">Home </v-btn>
       <v-toolbar-title class="headline text-uppercase">
         <span>KML API Test</span>
       </v-toolbar-title>
