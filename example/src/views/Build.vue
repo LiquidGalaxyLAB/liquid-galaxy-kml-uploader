@@ -66,14 +66,14 @@
           <v-text-field v-model="photo.east" label="east" solo ></v-text-field>
         </v-flex>
         <v-flex xs6 md5 lg1>
-          <v-text-field v-model="photo.west" label="west" solo ></v-text-field>
+          <v-text-field label="west" solo v-model="photo.west"  ></v-text-field>
         </v-flex>
 
         <v-flex xs12 md12 lg12>
-            <input type="file" id="groundOverlay" ref="file" accept="image/*" v-on:change="handleFileUpload(file)">
+            <input type="file" ref="file" accept="image/*">
         </v-flex>
         <v-flex xs12 md12 lg6>
-          <v-btn  block dark class="imageInput" @click="addPlacemark()">ADD PHOTO</v-btn>
+          <v-btn  block dark class="imageInput" @click="addPhoto()">ADD PHOTO</v-btn>
         </v-flex>
 
 
@@ -90,7 +90,6 @@ export default {
     placemark: {},
     photo:{},
     kmlName: "",
-    photo: "",
   }),
   methods: {
     newKml(){
@@ -137,9 +136,24 @@ export default {
       var vm = this
       var bodyFormData = new FormData()
       Object.keys(vm.photo).forEach(function(key){
-        bodyFormData.append(key,vm.placemark[key]);
+        bodyFormData.append(key,vm.photo[key]);
+        console.log(key)
       })
-      console.log(bodyFormData)
+      bodyFormData.append('image',this.$refs.file.files[0])
+      axios({
+        method: 'post',
+        url: 'http://www.localhost:8080/kml/builder/addPhoto',
+        data: bodyFormData,
+        config: { headers: {'Content-Type': 'multipart/form-data' }}
+      })
+      .then(function (response) {
+        //handle success
+        console.log(response);
+      })
+      .catch(function (response) {
+        //handle error
+        console.log("error",response);
+      });
     }
   }
 }
