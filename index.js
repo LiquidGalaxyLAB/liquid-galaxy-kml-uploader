@@ -33,7 +33,7 @@ lgKML.use(formidableMiddleware({
 
 },events));
 
-
+lgKML.use('/',express.static('/home/xemyst/kmlApi/images'));
 
 lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -77,9 +77,11 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 })
 
 lgKML.post('/kml/builder/addPhoto',function(req,res){
+  image = req.files.image
   data = req.fields
-  image = req.files.kml
-  kml.addGroundOverlay(data.id,image.path,data.name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
+  console.log("data" , data, "images" ,req.files)
+  name = 'http://192.168.86.26:8080/'+image.name
+  kml.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
   kml.saveKML(kmlDir)
   res.send("done")
 })
@@ -103,8 +105,11 @@ lgKML.get('/kml/manage/current',function(req,res){
 lgKML.get('/kml/manage/list',function(req,res){
   res.send(kmlList)
 })
-lgKML.put('/kml/manage/clean',function(req,res){
-  res.send("done")
+lgKML.get('/kml/manage/clean',function(req,res){
+  kml.startKml("initKml")
+  changeCurrentByName("initKml")
+  kml.saveKML((kmlDir))
+  res.send(currentKml)
 })
 lgKML.put('/kml/manage/:id',function(req,res){
   console.log(req.params)
@@ -183,13 +188,16 @@ lgKML.get('/system/:exec',function(req,res){
 })
 
 function changeCurrentByName(name){
-  kmlList.forEach(function(data,index){
-    console.log(data.name, name)
-    if(data.name === name){
-      currentKml = kmlList[index]
-    }
+  checkFolder().then(function(){
+    kmlList.forEach(function(data,index){
+      console.log(data.name, name)
+      if(data.name.includes(name)){
+        currentKml = kmlList[index]
+      }
+    })
+    console.log(currentKml)
   })
-  console.log(currentKml)
+
 }
 
 //suport functions

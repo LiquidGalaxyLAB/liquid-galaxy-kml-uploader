@@ -19,7 +19,7 @@
                 </v-list-tile-content>
               </v-list-tile>
             </template>
-
+favicon
           </v-list-group>
         </v-list>
       </v-card>
