@@ -33,7 +33,7 @@ lgKML.use(formidableMiddleware({
 
 },events));
 
-lgKML.use('/',express.static('/home/xemyst/kmlApi/images'));
+lgKML.use('/',express.static('/home/xemyst/kmlApi/'));
 
 lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -80,7 +80,11 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
   image = req.files.image
   data = req.fields
   console.log("data" , data, "images" ,req.files)
-  name = 'http://192.168.86.26:8080/'+image.name
+  // name = fs.readFileSync(image.path)
+  // var contentType = 'image/png'
+  // var base64=Buffer.from(name.toString('base64'))
+  // name = 'data:image/png;base64,'+ base64
+  name = 'http://8005e1e0.ngrok.io/images/'+ image.name
   kml.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
   kml.saveKML(kmlDir)
   res.send("done")
@@ -106,6 +110,7 @@ lgKML.get('/kml/manage/list',function(req,res){
   res.send(kmlList)
 })
 lgKML.get('/kml/manage/clean',function(req,res){
+  console.log(req)
   kml.startKml("initKml")
   changeCurrentByName("initKml")
   kml.saveKML((kmlDir))
@@ -170,9 +175,9 @@ lgKML.post('/kml/manage/upload/',function(req,res){
 * the endpoint to sync the kml
 ****/
 lgKML.get('/kml/viewsync',function(req,res){
-  console.log("request!")
+  // console.log("request!")
   res.setHeader('Content-Type', 'text/xml')
-  console.log(currentKml.path)
+  // console.log(currentKml.path)
   res.sendFile(currentKml.path)
 })
 
