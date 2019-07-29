@@ -261,4 +261,8 @@ function addKML(kml){
 checkFolder().then(function(){
   currentKml = kmlList[0]
 })
+
+/***
+*export
+**/
 module.exports = lgKML;
