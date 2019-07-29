@@ -20,9 +20,9 @@ const events = [
     action: function(req,res,next,name,file){
         console.log(file)
         if(acceptedImageTypes.includes(file['type']) || file['name'].includes('.png')){
-          file.path = "/home/xemyst/kmlApi/images/" + file.name
+          file.path = kmlDir + "/images/" + file.name
         }else if(kmlType.includes(file['type']) || file['name'].includes('.kml')){
-          file.path = "/home/xemyst/kmlApi/" + file.name
+          file.path = kmlDir + file.name
         }
     }
   }
@@ -72,8 +72,9 @@ lgKML.post('/kml/builder/addplacemark',function(req,res){
 lgKML.post('/kml/builder/Createtour',function(req,res){
   console.log(req.params())
 })
-lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 
+lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
+  pass
 })
 
 lgKML.post('/kml/builder/addPhoto',function(req,res){
@@ -87,7 +88,7 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
   name = 'http://8005e1e0.ngrok.io/images/'+ image.name
   kml.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
   kml.saveKML(kmlDir)
-  res.send("done")
+  res.send({ message : 'done' })
 })
 
 /***
@@ -106,6 +107,11 @@ lgKML.post('/kml/manage/new',function(req,res){
 lgKML.get('/kml/manage/current',function(req,res){
   res.send(currentKml)
 })
+
+lgKML.get('/kml/manage/current',function(req,res){
+  res.send(currentKml)
+})
+
 lgKML.get('/kml/manage/list',function(req,res){
   res.send(kmlList)
 })
@@ -119,18 +125,44 @@ lgKML.get('/kml/manage/clean',function(req,res){
 lgKML.put('/kml/manage/:id',function(req,res){
   console.log(req.params)
   currentKml = kmlList[req.params.id]
-  res.send("okay!")
+  res.send({message: "done" })
 })
 lgKML.put('/kml/manage',function(req,res){
   checkFolder().then(() => {
     res.send(kmlList)
   })
+})
+
+lgKML.get('/kml/manage/balloon/:id/:newState',function(req,res){
+  console.log(req.params)
+  kml.editBalloonState(req.params.id,req.params.newState)
+  kml.saveKML(kmlDir)
+  res.send({message : "done"})
+})
+
+
+
+lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
+  console.log(req.params)
+  kml.deleteTagById(req.params.tag, req.params.id)
+  res.send({message: "done" })
 
 })
-lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
-  console.log(req)
-  res.send("ok")
 
+lgKML.get('/kml/manage/initTour/:name',function(req,res){
+  var text = 'playtour=' + req.params.name
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    console.log(err)
+  })
+  req.send({message: "done" })
+})
+
+lgKML.get('/kml/manage/initTour/:name',function(req,res){
+  var text = 'playtour=' + req.params.name
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    console.log(err)
+  })
+  req.send({message: "done" })
 })
 
 lgKML.delete('/kml/manage/:id',function(req,res){
@@ -145,7 +177,6 @@ lgKML.delete('/kml/manage/:id',function(req,res){
     })
   }else{
     res.send(kmlList)
-
   }
 
 })
@@ -158,7 +189,6 @@ lgKML.post('/kml/manage/upload/',function(req,res){
   console.log(req.files, req.fields)
   checkFolder()
   .then(() => {
-    console.log(kml.name)
     changeCurrentByName(kml.name)
     res.send(kmlList)
   })
@@ -186,7 +216,6 @@ lgKML.get('/kml/viewsync',function(req,res){
 ***/
 
 lgKML.get('/system/:exec',function(req,res){
-    console.log(req.params)
     exec(req.params.exec, function(error, stdout, stderr){
         res.send(stdout);
     });
@@ -220,6 +249,7 @@ function checkFolder(){
     });
   })
 }
+
 function addKML(kml){
   kmlList.push({
     'id'    : kmlList.length,

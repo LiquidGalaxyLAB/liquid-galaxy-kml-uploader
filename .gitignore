@@ -3,3 +3,5 @@
 
 kml/
 test.js
+*.kml
+server.js
