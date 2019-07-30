@@ -10,6 +10,8 @@ KMLSERVERIP="$serverIp"
 KMLSERVERPORT="$serverPort"
 EOM
 
+#BUG FINDED! /document dosn't exist in some lgs
+
 #ADD the kml viewsync into my places to auto load
 sudo sed -i 's/<\/kml>//' ~/earth/kml/master/myplaces.kml
 sudo sed -i 's/<\/Document>//' ~/earth/kml/master/myplaces.kml
@@ -58,4 +60,6 @@ for lg in $LG_FRAMES; do
 		echo $lg
   	scp ~/earth/kml/slave/myplaces.kml lg@$lg:~/earth/kml/slave/myplaces.kml
 	fi
+done
+
 exit 0

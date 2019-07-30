@@ -13,6 +13,7 @@ kml.startKml("initKml")
 kml.saveKML(kmlDir)
 var kmlList = []
 var currentKml = {};
+var concatenate = [];
 
 var exec = require('child_process').exec;
 var bodyParser = require('body-parser')
@@ -101,12 +102,10 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
 * KML Manage endpoints
 ****/
 lgKML.post('/kml/manage/new',function(req,res){
-  console.log(req)
-  console.log(req.query.name)
   kml.startKml(req.query.name)
   kml.saveKML(kmlDir)
   checkFolder().then(() => {
-    changeCurrentByName(req.fields.name)
+    changeCurrentByName(req.query.name)
     res.send(kmlList)
   })
 })
@@ -147,6 +146,10 @@ lgKML.get('/kml/manage/balloon/:id/:newState',function(req,res){
   res.send({message : "done"})
 })
 
+
+lgKML.post('/kml/builder/concatenate',function(req,res){
+
+})
 
 
 lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
@@ -229,14 +232,15 @@ lgKML.get('/system/:exec',function(req,res){
 })
 
 function changeCurrentByName(name){
+  console.log(name,"im going to search")
   checkFolder().then(function(){
     kmlList.forEach(function(data,index){
       console.log(data.name, name)
       if(data.name.includes(name)){
         currentKml = kmlList[index]
+        console.log(currentKml)
       }
     })
-    console.log(currentKml)
   })
 
 }
