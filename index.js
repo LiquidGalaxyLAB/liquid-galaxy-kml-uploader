@@ -206,7 +206,6 @@ lgKML.post('/kml/manage/upload/',function(req,res){
     console.log(err)
   })
 
-
 })
 
 
