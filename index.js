@@ -67,13 +67,13 @@ lgKML.use(function(req, res, next) {
 lgKML.post('/kml/builder/addplacemark',function(req,res){
   data = req.fields
   console.log(req.fields)
-  kml.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon)
+  kml.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   kml.saveKML(kmlDir)
     .then(() =>{
-      res.send(true)
+      res.send({message: true})
     })
     .catch(()=>{
-      res.send(false)
+      res.send({message: false})
     })
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
