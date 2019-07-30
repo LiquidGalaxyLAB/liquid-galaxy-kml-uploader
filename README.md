@@ -14,6 +14,7 @@ Here we can see a project scheme:
 
 ![Project Definition](./docs/Definition.jpg)
 
+The system can create and edit a KML, but if it's the system who starts the kml, ig the user uploads a KML you just be able to display it, not edit.
 
 ## Configuration
 

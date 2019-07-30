@@ -1,11 +1,10 @@
 read -p "KML server IP: " serverIp
 read -p "KML server Port: " serverPort
+
 sudo tee -a /etc/environment << EOM
 KMLSERVERIP="$serverIp"
 KMLSERVERPORT="$serverPort"
 EOM
-
-export /etc/environment
 
 #ADD the kml viewsync into my places to auto load
 sudo sed -i 's/<\/kml>//' ~/earth/kml/master/myplaces.kml
@@ -27,6 +26,9 @@ cat >> ~/earth/kml/master/myplaces.kml << EOM
 </Document>
 </kml>
 EOM
+
+#Build directory structure.
+mkdir -p ~/kmlApi/images
 
 for lg in $LG_FRAMES; do
   scp ~/earth/kml/master/myplaces.kml lg@$lg:~/earth/kml/master/myplaces.kml

@@ -33,7 +33,7 @@ lgKML.use(formidableMiddleware({
 
 },events));
 
-lgKML.use('/',express.static('/home/xemyst/kmlApi/'));
+lgKML.use('/',express.static(kmlDir));
 
 lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -85,7 +85,7 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
   // var contentType = 'image/png'
   // var base64=Buffer.from(name.toString('base64'))
   // name = 'data:image/png;base64,'+ base64
-  name = 'http://8005e1e0.ngrok.io/images/'+ image.name
+  name = 'http://' + process.ENV.KMLSERVERIP + '/images/'+ image.name
   kml.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
   kml.saveKML(kmlDir)
   res.send({ message : 'done' })
@@ -96,10 +96,11 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
 ****/
 lgKML.post('/kml/manage/new',function(req,res){
   console.log(req)
-  console.log(req.fields.name)
-  kml.startKml(req.fields.name)
+  console.log(req.query.name)
+  kml.startKml(req.query.name)
   kml.saveKML(kmlDir)
   checkFolder().then(() => {
+    changeCurrentByName(req.fields.name)
     res.send(kmlList)
   })
 })
