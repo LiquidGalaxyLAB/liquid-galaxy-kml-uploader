@@ -27,9 +27,31 @@ cat >> ~/earth/kml/master/myplaces.kml << EOM
 </kml>
 EOM
 
+cat >> ~/earth/kml/slave/myplaces.kml << EOM
+	<Folder>
+    <name>KML API SYNC</name>
+    <open>1</open>
+		<NetworkLink>
+			<flyToView>5</flyToView>
+			<Link>
+				<href>http://$serverIp:$serverPort/kml/viewsync
+			</href>
+			<refreshMode>onInterval</refreshMode>
+			<refreshInterval>1</refreshInterval>
+			</Link>
+		</NetworkLink>
+	</Folder>
+</Document>
+</kml>
+EOM
+
 #Build directory structure.
 mkdir -p ~/kmlApi/images
 
 for lg in $LG_FRAMES; do
-  scp ~/earth/kml/master/myplaces.kml lg@$lg:~/earth/kml/master/myplaces.kml
+	if [ $lg != lg1 ]
+	then
+		echo $lg
+  	scp ~/earth/kml/slave/myplaces.kml lg@$lg:~/earth/kml/slave/myplaces.kml
+	fi
 exit 0

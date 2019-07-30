@@ -1,16 +1,23 @@
 const express = require("express")
 const lgKML = express.Router()
+
+
 var path = require('path');
 const kmlDir = path.join(require('os').homedir(),'/kmlApi/');
+
 var fs = require('fs');
+
 var kmlWriter = require('kmlwriter')
 const kml = new kmlWriter()
 kml.startKml("initKml")
 kml.saveKML(kmlDir)
 var kmlList = []
 var currentKml = {};
+
 var exec = require('child_process').exec;
 var bodyParser = require('body-parser')
+
+
 const formidableMiddleware = require('express-formidable');
 const acceptedImageTypes = ['image/gif', 'image/jpg' ,'image/jpeg', 'image/png'];
 const kmlType = ['text/xml', 'application/vnd.google-earth.kml+xml'];
@@ -18,9 +25,8 @@ const events = [
   {
     event: 'fileBegin',
     action: function(req,res,next,name,file){
-        console.log(file)
         if(acceptedImageTypes.includes(file['type']) || file['name'].includes('.png')){
-          file.path = kmlDir + "/images/" + file.name
+          file.path = kmlDir + "images/" + file.name
         }else if(kmlType.includes(file['type']) || file['name'].includes('.kml')){
           file.path = kmlDir + file.name
         }
@@ -78,14 +84,14 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 })
 
 lgKML.post('/kml/builder/addPhoto',function(req,res){
-  image = req.files.image
+  image = req.files.img
   data = req.fields
-  console.log("data" , data, "images" ,req.files)
+  console.log(data)
   // name = fs.readFileSync(image.path)
   // var contentType = 'image/png'
   // var base64=Buffer.from(name.toString('base64'))
   // name = 'data:image/png;base64,'+ base64
-  name = 'http://' + process.ENV.KMLSERVERIP + '/images/'+ image.name
+  name = 'http://' + process.env.KMLSERVERIP +":"+ process.env.KMLSERVERPORT + '/images/'+ image.name
   kml.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
   kml.saveKML(kmlDir)
   res.send({ message : 'done' })
