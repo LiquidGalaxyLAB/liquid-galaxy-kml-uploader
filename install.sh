@@ -15,6 +15,9 @@ EOM
 #ADD the kml viewsync into my places to auto load
 sudo sed -i 's/<\/kml>//' ~/earth/kml/master/myplaces.kml
 sudo sed -i 's/<\/Document>//' ~/earth/kml/master/myplaces.kml
+sudo sed -i 's/<\/kml>//' ~/earth/kml/slave/myplaces.kml
+sudo sed -i 's/<\/Document>//' ~/earth/kml/slave/myplaces.kml
+
 cat >> ~/earth/kml/master/myplaces.kml << EOM
 	<Folder>
     <name>KML API SYNC</name>

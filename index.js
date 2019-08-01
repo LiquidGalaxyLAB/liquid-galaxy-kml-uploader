@@ -66,7 +66,6 @@ lgKML.use(function(req, res, next) {
 ****/
 lgKML.post('/kml/builder/addplacemark',function(req,res){
   data = req.fields
-  console.log(req.fields)
   kml.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   kml.saveKML(kmlDir)
     .then(() =>{
@@ -87,7 +86,6 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 lgKML.post('/kml/builder/addPhoto',function(req,res){
   image = req.files.img
   data = req.fields
-  console.log(data)
   // name = fs.readFileSync(image.path)
   // var contentType = 'image/png'
   // var base64=Buffer.from(name.toString('base64'))
@@ -122,7 +120,6 @@ lgKML.get('/kml/manage/list',function(req,res){
   res.send(kmlList)
 })
 lgKML.get('/kml/manage/clean',function(req,res){
-  console.log(req)
   kml.startKml("initKml")
   changeCurrentByName("initKml")
   kml.saveKML((kmlDir))
@@ -139,18 +136,17 @@ lgKML.put('/kml/manage',function(req,res){
   })
 })
 
+
 lgKML.get('/kml/manage/balloon/:id/:newState',function(req,res){
-  console.log(req.params)
   kml.editBalloonState(req.params.id,req.params.newState)
   kml.saveKML(kmlDir)
   res.send({message : "done"})
 })
 
 
-lgKML.post('/kml/builder/concatenate',function(req,res){
-
-})
-
+// lgKML.post('/kml/builder/concatenate',function(req,res){
+//
+// })
 
 lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
   console.log(req.params)
@@ -177,7 +173,6 @@ lgKML.get('/kml/manage/initTour/:name',function(req,res){
 
 lgKML.delete('/kml/manage/:id',function(req,res){
   if(kmlList.length > 0){
-    console.log(kmlList[req.params.id].path)
     fs.unlink(kmlList[req.params.id].path,function(err){
       console.log(err)
     })
@@ -196,7 +191,6 @@ lgKML.delete('/kml/manage/:id',function(req,res){
 ****/
 lgKML.post('/kml/manage/upload/',function(req,res){
   var kml = req.files.kml
-  console.log(req.files, req.fields)
   checkFolder()
   .then(() => {
     changeCurrentByName(kml.name)
@@ -230,14 +224,24 @@ lgKML.get('/system/:exec',function(req,res){
     });
 })
 
+lgKML.get('/kml/flyto/:longitude/:latitude/:range',function(req,res){
+
+  var text = 'flytoview=<LookAt><longitude>' + req.params.longitude +'</longitude><latitude>' + req.params.latitude + '</latitude><range>' + req.params.range + '</range></LookAt>'
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    if(err){
+      console.log(err)
+    }
+  })
+  res.send({ message: 'Done' })
+
+})
+
+
 function changeCurrentByName(name){
-  console.log(name,"im going to search")
   checkFolder().then(function(){
     kmlList.forEach(function(data,index){
-      console.log(data.name, name)
       if(data.name.includes(name)){
         currentKml = kmlList[index]
-        console.log(currentKml)
       }
     })
   })
@@ -268,8 +272,11 @@ function addKML(kml){
     })
 }
 
+
+
+
 checkFolder().then(function(){
-  currentKml = kmlList[0]
+  changeCurrentByName('initKml')
 })
 
 /***
