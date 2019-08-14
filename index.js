@@ -152,7 +152,7 @@ lgKML.get('/kml/manage/clean',function(req,res){
   kmlSlave.startKml("initKmlSlave")
   updateKML()
   cleanScreen()
-  res.send({current: currentKmlmaster})
+  res.send({current: currentKmlMaster})
 })
 
 function cleanScreen(){
