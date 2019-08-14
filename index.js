@@ -12,9 +12,8 @@ const kmlMaster = new kmlWriter()
 const kmlSlave = new kmlWriter()
 
 kmlMaster.startKml("initKmlMaster")
-kmlMaster.saveKML(kmlDir)
 kmlSlave.startKml("initKmlMaster")
-kmlSlave.saveKML(kmlDir)
+updateKML()
 
 var kmlList = []
 var currentKmlMaster = {};
@@ -74,16 +73,8 @@ lgKML.post('/kml/builder/addplacemark',function(req,res){
   data = req.fields
   kmlMaster.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   kmlSlave.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
-  kmlMaster.saveKML(kmlDir)
-    .then(() =>{
-      kmlSlave.saveKML(kmlDir).then(() =>{
-
-        res.send({message: true})
-      })
-    })
-    .catch(()=>{
-      res.send({message: false})
-    })
+  updateKML()
+  res.send({message: true})
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
   console.log(req.params())
@@ -91,8 +82,9 @@ lgKML.post('/kml/builder/Createtour',function(req,res){
 
 lgKML.post('/kml/builder/drawpath',function(req,res){
   data = req.fields
-  kml.createLineString(data.id,data.name,data.path,data.tessellate)
-  kml.saveKML(kmlDir)
+  kmlMaster.createLineString(data.id,data.name,data.path,data.tessellate)
+  kmlMaster.createLineString(data.id,data.name,data.path,data.tessellate)
+  updateKML()
   res.send({ message : 'done' })
 })
 
@@ -101,12 +93,12 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 })
 
 lgKML.post('/kml/builder/orbit',function(req,res){
-  kml.startKml(req.query.name)
-  kml.saveKML(kmlDir)
-  checkFolder().then(() => {
-    changeCurrentByName(req.query.name)
-    res.send(kmlList)
-  })
+  data = req.fields
+  kmlMaster.createOrbit(data.id,data.name,data.description,data.longitude,data.latitude,data.range)
+  kmlSlave.createOrbit(data.id,data.name,data.description,data.longitude,data.latitude,data.range)
+  updateKML()
+  console.log('done')
+  res.send({message: 'done'})
 })
 
 lgKML.post('/kml/builder/addPhoto',function(req,res){
@@ -117,10 +109,11 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
   // var base64=Buffer.from(name.toString('base64'))
   // name = 'data:image/png;base64,'+ base64
   // name = 'http://' + process.env.KMLSERVERIP +":"+ process.env.KMLSERVERPORT + '/images/'+ image.name
-  name = 'http://' + '192.168.86.117' +":"+ '8080' + '/images/'+ image.name
+  name = 'http://' + process.env.KMLSERVERIP +":"+ process.env.KMLSERVERPORT + '/images/'+ image.name
 
-  kml.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
-  kml.saveKML(kmlDir)
+  kmlMaster.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
+  kmlSlave.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
+  updateKML()
   res.send({ message : 'done' })
 })
 
@@ -129,8 +122,9 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
 // })
 
 lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
-  kml.deleteTagById(req.params.tag, req.params.id)
-  kml.saveKML(kmlDir)
+  kmlMaster.deleteTagById(req.params.tag, req.params.id)
+  kmlSlave.deleteTagById(req.params.tag, req.params.id)
+  updateKML()
   res.send({message: "done" })
 })
 
@@ -138,11 +132,11 @@ lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
 * KML Manage endpoints
 ****/
 lgKML.post('/kml/manage/new',function(req,res){
-  kml.startKml(req.query.name)
-  kml.saveKML(kmlDir)
+  startNewKml(req.query.name)
+  updateKML()
   checkFolder().then(() => {
     changeCurrentByName(req.query.name)
-    res.send(kmlList)
+    res.send({list: kmlList})
   })
 })
 
@@ -155,11 +149,10 @@ lgKML.get('/kml/manage/list',function(req,res){
 })
 lgKML.get('/kml/manage/clean',function(req,res){
   kmlMaster.startKml("initKmlMaster")
-  kmlMaster.saveKML(kmlDir)
   kmlSlave.startKml("initKmlSlave")
-  kmlSlave.saveKML(kmlDir)
+  updateKML()
   cleanScreen()
-  res.send(currentKmlSlave)
+  res.send({current: currentKmlmaster})
 })
 
 function cleanScreen(){
@@ -167,14 +160,13 @@ function cleanScreen(){
       kmlList.forEach(function(data,index){
         if(data.name.includes('initKmlMaster')){
           currentKmlMaster = kmlList[index]
-          console.log("clear master",index)
         }else if(data.name.includes('initKmlSlave')){
           currentKmlSlave = kmlList[index]
-          console.log("clear slave",index)
         }
       })
     })
 }
+
 lgKML.put('/kml/manage/:id',function(req,res){
   console.log(req.params)
   currentKml = kmlList[req.params.id]
@@ -188,14 +180,10 @@ lgKML.put('/kml/manage',function(req,res){
 
 
 lgKML.get('/kml/manage/balloon/:id/:newState',function(req,res){
-  console.log(kmlMaster.kml.Folder)
   kmlMaster.editBalloonState(req.params.id,req.params.newState)
-  kmlMaster.saveKML(kmlDir)
+  updateKML()
   res.send({message : "done"})
 })
-
-
-
 
 lgKML.get('/kml/manage/initTour/:name',function(req,res){
   var text = 'playtour=' + req.params.name
@@ -242,15 +230,11 @@ lgKML.post('/kml/manage/upload/',function(req,res){
 * the endpoint to sync the kml
 ****/
 lgKML.get('/kml/viewsync/slave',function(req,res){
-  // console.log("request!")
   res.setHeader('Content-Type', 'text/xml')
-  // console.log(currentKml.path)
   res.sendFile(currentKmlSlave.path)
 })
 lgKML.get('/kml/viewsync/master',function(req,res){
-  // console.log("request!")
   res.setHeader('Content-Type', 'text/xml')
-  // console.log(currentKml.path)
   res.sendFile(currentKmlMaster.path)
 })
 
@@ -313,7 +297,15 @@ function addKML(kml){
     })
 }
 
+function updateKML(){
+  kmlMaster.saveKML(kmlDir)
+  kmlSlave.saveKML(kmlDir)
+}
 
+function startNewKml(name){
+  kmlMaster.saveKML(name)
+  kmlSlave.saveKML(name)
+}
 
 
 checkFolder().then(function(){
