@@ -1,0 +1,349 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters.",
+    "version": "1.0.0",
+    "title": "Kml Server Uploader",
+    "license": {
+      "name": "MIT",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "as",
+  "basePath": "/kml",
+  "tags": [
+    {
+      "name": "Builder",
+      "description": "All building kml calls"
+    },
+    {
+      "name": "Manage",
+      "description": "Access to Petstore orders"
+    },
+    {
+      "name": "View Sync"
+    },
+    {
+      "name": "Fly To"
+    },
+    {
+      "name": "System"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/builder/addplacemark": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "summary": "Add a new pet to the store",
+        "description": "Add a placemark into the current kml",
+        "operationId": "addPlacemark",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The placemark was created",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Placemark"
+            }
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/builder/addphoto": {
+      "post": {
+        "tags": [
+          "Builder"
+        ],
+        "summary": "Add image to the kml",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "findPetsByStatus",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The image was added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Photo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/builder/concatenate": {
+      "get": {
+        "tags": [
+          "Builder"
+        ]
+      }
+    },
+    "/builder/Orbit": {
+      "post": {
+        "tags": [
+          "Builder"
+        ]
+      }
+    },
+    "/builder/deleteTag/:tag/:id": {
+      "delete": {
+        "tags": [
+          "Builder"
+        ]
+      }
+    },
+    "/manage/new": {
+      "post": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage/current": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage/list": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manae/clean": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage/:id": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage/balloon/:id/:newState": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage/initTour/:name": {
+      "get": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/manage/upload": {
+      "post": {
+        "tags": [
+          "Manage"
+        ]
+      }
+    },
+    "/system/:exec": {
+      "get": {
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/viewsync/master": {
+      "get": {
+        "tags": [
+          "View Sync"
+        ],
+        "summary": "get the current master kml",
+        "description": "returns the current kml to be displayed in the liquid galaxy",
+        "operationId": "viewsync",
+        "produces": [
+          "application/vnd.google-earth.kml+xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/viewsync/slave": {
+      "get": {
+        "tags": [
+          "View Sync"
+        ],
+        "summary": "get the current slave kml",
+        "description": "returns the current kml to be displayed in the liquid galaxy",
+        "operationId": "viewsync",
+        "produces": [
+          "application/vnd.google-earth.kml+xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/flyto/:longitude/:latitude/:range": {
+      "post": {
+        "tags": [
+          "Fly To"
+        ],
+        "summary": "fly to a position",
+        "description": "returns the current kml to be displayed in the liquid galaxy",
+        "operationId": "flyto",
+        "produces": [
+          "application/vnd.google-earth.kml+xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Placemark": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "latitude": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "range": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "altitudeMode": {
+          "type": "string",
+          "default": "relativeToGround",
+          "enum": [
+            "relativeToGround",
+            "relativeToSea"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "The bubble text"
+        },
+        "icon": {
+          "type": "string",
+          "description": "the path to the icon"
+        },
+        "scale": {
+          "type": "integer",
+          "description": "the scale of the icon"
+        }
+      }
+    },
+    "Photo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "fCorner": {
+          "type": "string",
+          "description": "The down-left, corner. The data need to be in [lon,lat,rang] format"
+        },
+        "sCorner": {
+          "type": "string",
+          "description": "The down-right, corner. The data need to be in [lon,lat,rang] format"
+        },
+        "tCorner": {
+          "type": "string",
+          "description": "The top-right, corner. The data need to be in [lon,lat,rang] format"
+        },
+        "ftCorner": {
+          "type": "string",
+          "description": "The top-left, corner. The data need to be in [lon,lat,rang] format"
+        },
+        "photo": {
+          "type": "file",
+          "format": "png, jpg"
+        }
+      }
+    },
+    "Kml": {
+      "type": "object",
+      "properties": {
+        "kml": {
+          "type": "file",
+          "format": "kml"
+        }
+      }
+    }
+  }
+}

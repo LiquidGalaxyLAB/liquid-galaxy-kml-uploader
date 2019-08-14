@@ -17,7 +17,8 @@ sudo sed -i 's/<\/kml>//' ~/earth/kml/master/myplaces.kml
 sudo sed -i 's/<\/Document>//' ~/earth/kml/master/myplaces.kml
 sudo sed -i 's/<\/kml>//' ~/earth/kml/slave/myplaces.kml
 sudo sed -i 's/<\/Document>//' ~/earth/kml/slave/myplaces.kml
-
+sed -i "s/<ServerIP>/$serverIp/" documentation.json
+sed -i "s/<ServerPort>/$serverPort/" documentation.json
 cat >> ~/earth/kml/master/myplaces.kml << EOM
 	<Folder>
     <name>KML API SYNC</name>
