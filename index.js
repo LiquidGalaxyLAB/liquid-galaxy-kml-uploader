@@ -80,6 +80,15 @@ lgKML.post('/kml/builder/Createtour',function(req,res){
   console.log(req.params())
 })
 
+
+lgKML.put('/kml/builder/editCoodPlacemark',function(req,res){
+  data = req.fields
+  kmlMaster.editCoodPlacemark(data.id,data.latitude,data.longitude,data.range)
+  kmlSlave.editCoodPlacemark(data.id,data.latitude,data.longitude,data.range)
+  updateKML()
+  res.send({message:'done'})
+})
+
 lgKML.post('/kml/builder/drawpath',function(req,res){
   data = req.fields
   kmlMaster.createLineString(data.id,data.name,data.path,data.tessellate)
@@ -115,6 +124,14 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
   kmlSlave.addGroundOverlay(data.id,data.name,name,data.fCorner,data.sCorner,data.tCorner,data.ftCorner)
   updateKML()
   res.send({ message : 'done' })
+})
+
+lgKML.get('/kml/manage/stopTour',function(req,res){
+  var text = 'exittour=true'
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    console.log(err)
+  })
+  res.send({message: 'done'})
 })
 
 // lgKML.post('/kml/builder/concatenate',function(req,res){
@@ -311,6 +328,8 @@ function startNewKml(name){
 checkFolder().then(function(){
   changeCurrentByName('initKml')
 })
+
+cleanScreen()
 
 /***
 *export
