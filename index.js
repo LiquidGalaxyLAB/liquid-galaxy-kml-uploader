@@ -77,7 +77,6 @@ lgKML.post('/kml/builder/addplacemark',function(req,res){
   res.send({message: true})
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
-  console.log(req.params())
 })
 
 
@@ -106,7 +105,6 @@ lgKML.post('/kml/builder/orbit',function(req,res){
   kmlMaster.createOrbit(data.id,data.name,data.description,data.longitude,data.latitude,data.range)
   kmlSlave.createOrbit(data.id,data.name,data.description,data.longitude,data.latitude,data.range)
   updateKML()
-  console.log('done')
   res.send({message: 'done'})
 })
 
@@ -194,7 +192,6 @@ function cleanScreen(){
 }
 
 lgKML.put('/kml/manage/:id',function(req,res){
-  console.log(req.params)
   currentKml = kmlList[req.params.id]
   res.send({message: "done" })
 })
