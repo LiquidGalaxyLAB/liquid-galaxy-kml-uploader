@@ -92,7 +92,7 @@ lgKML.put('/kml/builder/editCoodPlacemark',function(req,res){
 lgKML.post('/kml/builder/drawpath',function(req,res){
   data = req.fields
   kmlMaster.createLineString(data.id,data.name,data.path,data.tessellate)
-  kmlMaster.createLineString(data.id,data.name,data.path,data.tessellate)
+  kmlSlave.createLineString(data.id,data.name,data.path,data.tessellate)
   updateKML()
   res.send({ message : 'done' })
 })
@@ -134,9 +134,18 @@ lgKML.get('/kml/manage/stopTour',function(req,res){
   res.send({message: 'done'})
 })
 
-// lgKML.post('/kml/builder/concatenate',function(req,res){
-//
-// })
+lgKML.post('/kml/builder/concatenate',function(req,res){
+  var kmlname = currentKmlMaster.path
+  var out
+
+  concatenate.forEach(function(cKml){
+    cKml = fs.readFileSync(cKml.path)
+    out += cKml.replace(/<\?{0,1}[kx]{1}ml[^>]*>|<\/{0,1}Document[^>]*>/g,'')
+
+  })
+
+  fs.writeFile(out,kmldir)
+})
 
 lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
   kmlMaster.deleteTagById(req.params.tag, req.params.id)
