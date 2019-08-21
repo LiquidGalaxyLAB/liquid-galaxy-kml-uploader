@@ -13,6 +13,7 @@ const kmlSlave = new kmlWriter()
 
 kmlMaster.startKml("initKmlMaster")
 kmlSlave.startKml("initKmlSlave")
+console.log('0a')
 updateKML()
 
 var kmlList = []
@@ -252,8 +253,9 @@ lgKML.post('/kml/manage/upload/',function(req,res){
   var kml = req.files.kml
   checkFolder()
   .then(() => {
-    console.log(kmlList)
     changeCurrentByName(kml.name)
+    // joinKMLs(currentKmlMaster.path)
+    // joinKMLs(currentKmlSlave.path)
     res.send({message: "done", List: kmlList})
   })
   .catch((err) =>{
@@ -303,13 +305,15 @@ function changeCurrentByName(name){
   name = name.split('.kml')[0]
   checkFolder().then(function(){
     kmlList.forEach(function(data,index){
-      console.log(name)
       if(data.name.includes(name)){
         currentKmlMaster = kmlList[index]
         currentKmlSlave = kmlList[index]
       }
     })
   })
+  joinKMLs(currentKmlMaster.path)
+  joinKMLs(currentKmlSlave.path)
+
 
 }
 
@@ -339,13 +343,15 @@ function addKML(kml){
 function updateKML(){
   kmlMaster.saveKML(kmlDir)
   .then(function(res){
+
     joinKMLs(currentKmlMaster.path)
   })
-
   kmlSlave.saveKML(kmlDir)
   .then(function(res){
     joinKMLs(currentKmlSlave.path)
-  })  // joinKMLs(currentKmlSlave.path)
+
+  })
+  // joinKMLs(currentKmlSlave.path)
 }
 
 function startNewKml(name){
@@ -356,17 +362,16 @@ function startNewKml(name){
 function joinKMLs(CurrentPath){
   console.log(CurrentPath,'join')
   var out = fs.readFileSync(CurrentPath).toString()
-  console.log(out,'prereplace')
+  console.log(out,'das','prereplace')
   out = out.replace(/<\/Document[^>]*>|<\/kml[^>]*>/g,"")
   concatenate.forEach(function(cKml){
     cKml = fs.readFileSync(cKml).toString().replace(/<\?{0,1}\/{0,1}[kx]{1}ml[^>]*>/g,'')
     cKml = cKml.replace(/<\/Document/g,'</Folder')
     cKml = cKml.replace(/<Document/g,'<Folder')
-
     out += cKml
   })
   out += '</Document></kml>'
-  console.log(out, 'post')
+  // CurrentPath
   fs.writeFile(CurrentPath,out,function(err){
     if(err){
       console.log(err)

@@ -1,5 +1,4 @@
 #!/bin/sh
-
 . ${HOME}/etc/shell.conf
 
 read -p "KML server IP: " serverIp
