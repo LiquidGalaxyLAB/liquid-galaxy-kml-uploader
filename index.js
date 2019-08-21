@@ -13,7 +13,6 @@ const kmlSlave = new kmlWriter()
 
 kmlMaster.startKml("initKmlMaster")
 kmlSlave.startKml("initKmlSlave")
-console.log('0a')
 updateKML()
 
 var kmlList = []
@@ -128,7 +127,10 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
 lgKML.get('/kml/manage/stopTour',function(req,res){
   var text = 'exittour=true'
   fs.writeFile('/tmp/query.txt', text,function(err){
-    console.log(err)
+    if(err){
+      console.log(err)
+    }
+
   })
   res.send({message: 'done'})
 })
@@ -143,20 +145,6 @@ lgKML.post('/kml/builder/concatenate',function(req,res){
   // })
   updateKML()
   res.send({message: 'done'})
-  // concatenate.forEach(function(cKml){
-  //   cKml = fs.readFileSync(cKml).toString().replace(/<\?{0,1}\/{0,1}[kx]{1}ml[^>]*>|<\/{0,1}Document[^>]*>/g,'')
-  //   console.log(cKml,"c")
-  //   out += cKml
-  // })
-  // out += '</kml>'
-  // console.log(out, "two")
-  // fs.writeFile('./post',out,function(err){
-  //   if(err){
-  //     console.log(err)
-  //   }else{
-  //     res.send({message:'done'})
-  //   }
-  // })
 })
 
 lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
@@ -226,7 +214,10 @@ lgKML.get('/kml/manage/balloon/:id/:newState',function(req,res){
 lgKML.get('/kml/manage/initTour/:name',function(req,res){
   var text = 'playtour=' + req.params.name
   fs.writeFile('/tmp/query.txt', text,function(err){
+  if(err){
     console.log(err)
+  }
+
   })
   res.send({message: "done" })
 })
@@ -360,9 +351,7 @@ function startNewKml(name){
 }
 
 function joinKMLs(CurrentPath){
-  console.log(CurrentPath,'join')
   var out = fs.readFileSync(CurrentPath).toString()
-  console.log(out,'das','prereplace')
   out = out.replace(/<\/Document[^>]*>|<\/kml[^>]*>/g,"")
   concatenate.forEach(function(cKml){
     cKml = fs.readFileSync(cKml).toString().replace(/<\?{0,1}\/{0,1}[kx]{1}ml[^>]*>/g,'')
