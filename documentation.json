@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters.",
+    "description": "This is the KML API documentation",
     "version": "1.0.0",
     "title": "Kml Server Uploader",
     "license": {
@@ -9,7 +9,7 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "as",
+  "host": "<ServerIP>:<ServerPort>",
   "basePath": "/kml",
   "tags": [
     {
@@ -18,7 +18,6 @@
     },
     {
       "name": "Manage",
-      "description": "Access to Petstore orders"
     },
     {
       "name": "View Sync"
@@ -103,98 +102,287 @@
     },
     "/builder/concatenate": {
       "get": {
+        "description": "Add a kml into the current kml that you are building",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The kml file",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Kml"
+            }
+          }
+        ],
         "tags": [
           "Builder"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/builder/Orbit": {
       "post": {
         "tags": [
           "Builder"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        },
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The kml file",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Orbit"
+            }
+          }
         ]
       }
     },
-    "/builder/deleteTag/:tag/:id": {
+    "/builder/deleteTag/{tag}/{id}": {
       "delete": {
         "tags": [
           "Builder"
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "description": "The tag name that you want to delete",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the tag to delete",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/manage/new": {
       "post": {
+        "summary": "Start a new KML",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The name for the new kml",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
         "tags": [
           "Manage"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/manage/current": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/manage/list": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/manae/clean": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
-    "/manage/:id": {
+    "/manage/{id}": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the kml that you want to see",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       },
       "delete": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the kml that you want to delete",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/manage": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
-    "/manage/balloon/:id/:newState": {
+    "/manage/balloon/{id}/{newState}": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The name of the tour to init",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "newState",
+            "in": "path",
+            "description": "The name of the tour to init",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
-    "/manage/initTour/:name": {
+    "/manage/initTour/{name}": {
       "get": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The name of the tour to init",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
     "/manage/upload": {
       "post": {
         "tags": [
           "Manage"
-        ]
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
       }
     },
-    "/system/:exec": {
+    "/system/{exec}": {
       "get": {
         "tags": [
           "System"
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "exec",
+            "in": "path",
+            "description": "The bash command to execute",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
       }
     },
     "/viewsync/master": {
@@ -203,17 +391,13 @@
           "View Sync"
         ],
         "summary": "get the current master kml",
-        "description": "returns the current kml to be displayed in the liquid galaxy",
-        "operationId": "viewsync",
+        "description": "returns the current master kml to be displayed in the liquid galaxy",
         "produces": [
           "application/vnd.google-earth.kml+xml"
         ],
         "responses": {
           "200": {
             "description": "successful operation"
-          },
-          "400": {
-            "description": "Invalid status value"
           }
         }
       }
@@ -224,31 +408,53 @@
           "View Sync"
         ],
         "summary": "get the current slave kml",
-        "description": "returns the current kml to be displayed in the liquid galaxy",
-        "operationId": "viewsync",
+        "description": "returns the current slave kml to be displayed in the liquid galaxy",
         "produces": [
           "application/vnd.google-earth.kml+xml"
         ],
         "responses": {
           "200": {
             "description": "successful operation"
-          },
-          "400": {
-            "description": "Invalid status value"
           }
         }
       }
     },
-    "/flyto/:longitude/:latitude/:range": {
+    "/flyto/{longitude}/{latitude}/{range}": {
       "post": {
         "tags": [
           "Fly To"
         ],
         "summary": "fly to a position",
-        "description": "returns the current kml to be displayed in the liquid galaxy",
+        "description": "Moves the liquid galaxy into the asked position",
         "operationId": "flyto",
+        "parameters": [
+          {
+            "name": "longitude",
+            "in": "path",
+            "description": "the longitude of the camera",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "latitude",
+            "in": "path",
+            "description": "the latitude of the camera",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "range",
+            "in": "path",
+            "description": "The range of the camera",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
         "produces": [
-          "application/vnd.google-earth.kml+xml"
+          "application/json"
         ],
         "responses": {
           "200": {
@@ -331,7 +537,7 @@
           "description": "The top-left, corner. The data need to be in [lon,lat,rang] format"
         },
         "photo": {
-          "type": "file",
+          "type": "object",
           "format": "png, jpg"
         }
       }
@@ -340,8 +546,28 @@
       "type": "object",
       "properties": {
         "kml": {
-          "type": "file",
+          "type": "object",
           "format": "kml"
+        }
+      }
+    },
+    "Orbit": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "string"
+        },
+        "range": {
+          "type": "string"
         }
       }
     }
