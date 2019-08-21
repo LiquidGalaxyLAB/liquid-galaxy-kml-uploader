@@ -26,7 +26,7 @@ cat >> ~/earth/kml/master/myplaces.kml << EOM
 		<NetworkLink>
 			<flyToView>5</flyToView>
 			<Link>
-				<href>http://$serverIp:$serverPort/kml/viewsync
+				<href>http://$serverIp:$serverPort/kml/viewsync/master
 			</href>
 			<refreshMode>onInterval</refreshMode>
 			<refreshInterval>1</refreshInterval>
@@ -44,7 +44,7 @@ cat >> ~/earth/kml/slave/myplaces.kml << EOM
 		<NetworkLink>
 			<flyToView>5</flyToView>
 			<Link>
-				<href>http://$serverIp:$serverPort/kml/viewsync
+				<href>http://$serverIp:$serverPort/kml/viewsync/slave
 			</href>
 			<refreshMode>onInterval</refreshMode>
 			<refreshInterval>1</refreshInterval>

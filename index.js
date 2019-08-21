@@ -12,7 +12,7 @@ const kmlMaster = new kmlWriter()
 const kmlSlave = new kmlWriter()
 
 kmlMaster.startKml("initKmlMaster")
-kmlSlave.startKml("initKmlMaster")
+kmlSlave.startKml("initKmlSlave")
 updateKML()
 
 var kmlList = []
@@ -102,8 +102,8 @@ lgKML.post('/kml/builder/addpoint/:tourName',function(req,res){
 
 lgKML.post('/kml/builder/orbit',function(req,res){
   data = req.fields
-  kmlMaster.createOrbit(data.id,data.name,data.description,data.longitude,data.latitude,data.range)
-  kmlSlave.createOrbit(data.id,data.name,data.description,data.longitude,data.latitude,data.range)
+  kmlMaster.createOrbit(data.id,data.name,data.description,data.latitude,data.longitude,data.range)
+  kmlSlave.createOrbit(data.id,data.name,data.description,data.latitude,data.longitude,data.range)
   updateKML()
   res.send({message: 'done'})
 })
@@ -133,16 +133,29 @@ lgKML.get('/kml/manage/stopTour',function(req,res){
 })
 
 lgKML.post('/kml/builder/concatenate',function(req,res){
-  var kmlname = currentKmlMaster.path
-  var out
-
-  concatenate.forEach(function(cKml){
-    cKml = fs.readFileSync(cKml.path)
-    out += cKml.replace(/<\?{0,1}[kx]{1}ml[^>]*>|<\/{0,1}Document[^>]*>/g,'')
-
-  })
-
-  fs.writeFile(out,kmldir)
+  concatenate.push(req.files.kml.path)
+  // console.log(req.files.kml.path)
+  // fs.writeFile('./pre',out,function(err){
+  //   if(err){
+  //     console.log(err)
+  //   }
+  // })
+  updateKML()
+  res.send({message: 'done'})
+  // concatenate.forEach(function(cKml){
+  //   cKml = fs.readFileSync(cKml).toString().replace(/<\?{0,1}\/{0,1}[kx]{1}ml[^>]*>|<\/{0,1}Document[^>]*>/g,'')
+  //   console.log(cKml,"c")
+  //   out += cKml
+  // })
+  // out += '</kml>'
+  // console.log(out, "two")
+  // fs.writeFile('./post',out,function(err){
+  //   if(err){
+  //     console.log(err)
+  //   }else{
+  //     res.send({message:'done'})
+  //   }
+  // })
 })
 
 lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
@@ -180,6 +193,7 @@ lgKML.get('/kml/manage/clean',function(req,res){
 })
 
 function cleanScreen(){
+    concatenate = []
     checkFolder().then(function(){
       kmlList.forEach(function(data,index){
         if(data.name.includes('initKmlMaster')){
@@ -238,6 +252,7 @@ lgKML.post('/kml/manage/upload/',function(req,res){
   var kml = req.files.kml
   checkFolder()
   .then(() => {
+    console.log(kmlList)
     changeCurrentByName(kml.name)
     res.send({message: "done", List: kmlList})
   })
@@ -285,8 +300,10 @@ lgKML.get('/kml/flyto/:longitude/:latitude/:range',function(req,res){
 
 
 function changeCurrentByName(name){
+  name = name.split('.kml')[0]
   checkFolder().then(function(){
     kmlList.forEach(function(data,index){
+      console.log(name)
       if(data.name.includes(name)){
         currentKmlMaster = kmlList[index]
         currentKmlSlave = kmlList[index]
@@ -306,7 +323,6 @@ function checkFolder(){
           addKML(file)
         }
       });
-
       resolve()
     });
   })
@@ -315,14 +331,21 @@ function checkFolder(){
 function addKML(kml){
   kmlList.push({
     'id'    : kmlList.length,
-    'name'  : kml.split(".js")[0],
+    'name'  : kml.split(".kml")[0],
     'path'  : path.join(kmlDir,kml)
     })
 }
 
 function updateKML(){
   kmlMaster.saveKML(kmlDir)
+  .then(function(res){
+    joinKMLs(currentKmlMaster.path)
+  })
+
   kmlSlave.saveKML(kmlDir)
+  .then(function(res){
+    joinKMLs(currentKmlSlave.path)
+  })  // joinKMLs(currentKmlSlave.path)
 }
 
 function startNewKml(name){
@@ -330,13 +353,28 @@ function startNewKml(name){
   kmlSlave.saveKML(name)
 }
 
+function joinKMLs(CurrentPath){
+  console.log(CurrentPath,'join')
+  var out = fs.readFileSync(CurrentPath).toString()
+  console.log(out,'prereplace')
+  out = out.replace(/<\/Document[^>]*>|<\/kml[^>]*>/g,"")
+  concatenate.forEach(function(cKml){
+    cKml = fs.readFileSync(cKml).toString().replace(/<\?{0,1}\/{0,1}[kx]{1}ml[^>]*>/g,'')
+    cKml = cKml.replace(/<\/Document/g,'</Folder')
+    cKml = cKml.replace(/<Document/g,'<Folder')
 
-checkFolder().then(function(){
-  changeCurrentByName('initKml')
-})
+    out += cKml
+  })
+  out += '</Document></kml>'
+  console.log(out, 'post')
+  fs.writeFile(CurrentPath,out,function(err){
+    if(err){
+      console.log(err)
+    }
+  })
+}
 
 cleanScreen()
-
 /***
 *export
 **/
