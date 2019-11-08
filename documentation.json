@@ -9,7 +9,7 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "ServerAddress",
+  "host": "localhost:8080",
   "basePath": "/kml",
   "tags": [
     {
@@ -38,7 +38,7 @@
         "tags": [
           "Builder"
         ],
-        "summary": "Add a new pet to the store",
+        "summary": "Add a new placemark",
         "description": "Add a placemark into the current kml",
         "operationId": "addPlacemark",
         "consumes": [
@@ -83,7 +83,7 @@
           {
             "in": "body",
             "name": "body",
-            "description": "The image was added",
+            "description": "Add a image to the current kml. Needs to set the id, the name, and the four courners. finally set the image file",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Photo"
@@ -102,7 +102,7 @@
     },
     "/builder/concatenate": {
       "get": {
-        "description": "Add a kml into the current kml that you are building",
+        "description": "Add a custom kml to the current displayed kml.",
         "parameters": [
           {
             "in": "body",
@@ -138,7 +138,7 @@
           {
             "in": "body",
             "name": "body",
-            "description": "The kml file",
+            "description": "build a orbit, seting the longitude, latitude and range of the obrit. The name field will be the name of the tour, for later init it",
             "required": true,
             "schema": {
               "$ref": "#/definitions/Orbit"
@@ -202,6 +202,7 @@
     },
     "/manage/current": {
       "get": {
+        "summary": "Return the id, name and path of the current kml",
         "tags": [
           "Manage"
         ],
@@ -214,6 +215,7 @@
     },
     "/manage/list": {
       "get": {
+        "summary": "Get the kml list, and their id's from the server",
         "tags": [
           "Manage"
         ],
@@ -226,6 +228,7 @@
     },
     "/manae/clean": {
       "get": {
+        "summary": "Clean the current visualitzation, and starts a new empty kml",
         "tags": [
           "Manage"
         ],
@@ -238,6 +241,7 @@
     },
     "/manage/{id}": {
       "get": {
+        "summary": "Change the current kml to the designed by the id variable",
         "tags": [
           "Manage"
         ],
@@ -258,6 +262,7 @@
         }
       },
       "delete": {
+        "summary": "Delete a Kml",
         "tags": [
           "Manage"
         ],
@@ -278,18 +283,6 @@
         }
       }
     },
-    "/manage": {
-      "get": {
-        "tags": [
-          "Manage"
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation"
-          }
-        }
-      }
-    },
     "/manage/balloon/{id}/{newState}": {
       "get": {
         "tags": [
@@ -299,7 +292,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "The name of the tour to init",
+            "description": "The id of the placemark that contains the balloon that will be edited",
             "required": true,
             "type": "string",
             "format": "string"
@@ -307,7 +300,7 @@
           {
             "name": "newState",
             "in": "path",
-            "description": "The name of the tour to init",
+            "description": "set the new state of the balloon: 1 open, 0 close",
             "required": true,
             "type": "string",
             "format": "string"
@@ -344,6 +337,7 @@
     },
     "/manage/upload": {
       "post": {
+        "summary": "Upload a new kml to the system",
         "tags": [
           "Manage"
         ],

@@ -70,6 +70,7 @@ lgKML.use(function(req, res, next) {
 *  params  id,name,lon,lat,range, altMode = 'relativeToGround', description = '', icon= ''
 ****/
 lgKML.post('/kml/builder/addplacemark',function(req,res){
+  console.log('das')
   data = req.fields
   kmlMaster.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   kmlSlave.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
