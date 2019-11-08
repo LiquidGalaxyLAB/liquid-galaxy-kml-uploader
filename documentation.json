@@ -342,7 +342,10 @@
           "Manage"
         ],
         "parameters": [
-          "KML": "send the kml file to the server"
+          "type": "file",
+          "in":"body",
+          "name": "KML",
+          "description": "send the kml file to the server"
         ],
         "produces": [
           "application/json"
