@@ -4,10 +4,9 @@
 read -p "KML server IP: " serverIp
 read -p "KML server Port: " serverPort
 
-sudo tee -a ~/etc/environment << EOM
-KMLSERVERIP="$serverIp"
-KMLSERVERPORT="$serverPort"
-EOM
+sed -i "s/$serverPort/$serverPort/" .env
+sed -i "s/$serverIp/$serverIp/" .env
+
 
 #BUG FINDED! /document dosn't exist in some lgs
 

@@ -1,5 +1,6 @@
 var express = require('express')
 const app = express()
+require('dotenv').config()
 var lgKML = require('./index.js')
 var port = process.env.KMLSERVERPORT || 8080
 
