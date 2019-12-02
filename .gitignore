@@ -1,7 +1,6 @@
 /node_modules/
 /projectPlanning/
 
-.env*
 kml/
 test.js
 *.kml
