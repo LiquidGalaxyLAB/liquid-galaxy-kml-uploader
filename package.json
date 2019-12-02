@@ -1,6 +1,6 @@
 {
   "name": "lgkmluploader",
-  "version": "0.8",
+  "version": "1.0.0",
   "description": "API to send our KML and create them, and Send to the Liquid Galaxy",
   "main": "index.js",
   "scripts": {
