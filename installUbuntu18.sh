@@ -4,7 +4,7 @@
 read -p "KML server IP: " serverIp
 read -p "KML server Port: " serverPort
 
-sudo tee -a /etc/environment << EOM
+sudo tee -a ~/etc/environment << EOM
 KMLSERVERIP="$serverIp"
 KMLSERVERPORT="$serverPort"
 EOM
@@ -32,6 +32,7 @@ cat >> ~/earth/kml/master/myplaces.kml << EOM
 			</Link>
 		</NetworkLink>
 	</Folder>
+	</Document>
 </kml>
 EOM
 
@@ -49,6 +50,7 @@ cat >> ~/earth/kml/slave/myplaces.kml << EOM
 			</Link>
 		</NetworkLink>
 	</Folder>
+	</Document>
 </kml>
 EOM
 
