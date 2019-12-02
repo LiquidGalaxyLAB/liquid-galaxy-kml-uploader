@@ -4,8 +4,8 @@
 read -p "KML server IP: " serverIp
 read -p "KML server Port: " serverPort
 
-sed -i "s/$serverPort/$serverPort/" .env
-sed -i "s/$serverIp/$serverIp/" .env
+sed -i "s/##PORT##/$serverPort/" .env
+sed -i "s/##IP##/$serverIp/" .env
 
 
 #BUG FINDED! /document dosn't exist in some lgs
