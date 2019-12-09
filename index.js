@@ -74,8 +74,9 @@ lgKML.post('/kml/builder/addplacemark',function(req,res){
   data = req.fields
   kmlMaster.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   kmlSlave.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
-  updateKML()
-  res.send({message: true})
+  updateKML().then( () => {
+      res.send({message: true})
+    })
 })
 lgKML.post('/kml/builder/Createtour',function(req,res){
 })
@@ -333,17 +334,24 @@ function addKML(kml){
 }
 
 function updateKML(){
-  kmlMaster.saveKML(kmlDir)
-  .then(function(res){
+  return new Promise(function(resolve, reject) {
+    Promise.all([kmlMaster.saveKML(kmlDir), kmlSlave.saveKML(kmlDir)])
+      .then( (values) => {
+        console.log('then')
+        resolve() })
+      .catch( (values) => { reject()})
+  });
+  // kmlMaster.saveKML(kmlDir)
+  // .then(function(res){
+  //
+  //   joinKMLs(currentKmlMaster.path)
+  // })
+  // kmlSlave.saveKML(kmlDir)
+  // .then(function(res){
+  //   joinKMLs(currentKmlSlave.path)
+  //
+  // })
 
-    joinKMLs(currentKmlMaster.path)
-  })
-  kmlSlave.saveKML(kmlDir)
-  .then(function(res){
-    joinKMLs(currentKmlSlave.path)
-
-  })
-  // joinKMLs(currentKmlSlave.path)
 }
 
 function startNewKml(name){
