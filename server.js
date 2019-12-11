@@ -2,7 +2,7 @@ var express = require('express')
 const app = express()
 require('dotenv').config()
 var lgKML = require('./index.js')
-var port = process.env.KMLSERVERPORT || 8080
+var port = 5430 
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./documentation.json');

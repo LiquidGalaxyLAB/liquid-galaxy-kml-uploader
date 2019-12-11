@@ -1,11 +1,18 @@
-const express = require("express")
-const lgKML = express.Router()
+const express   = require("express")
+let path        = require('path');
+const lgKML     = express.Router();
+let fs          = require('fs');
+
+global.kml = {
+  kmlList: [],
+  currentKmlMaster: {},
+  currentKmlMaster: {},
+  kmlDir: path.join(require('os').homedir(),'/kmlApi/')
+}
 
 
-var path = require('path');
-const kmlDir = path.join(require('os').homedir(),'/kmlApi/');
 
-var fs = require('fs');
+
 
 var kmlWriter = require('kmlwriter')
 const kmlMaster = new kmlWriter()
@@ -32,9 +39,9 @@ const events = [
     event: 'fileBegin',
     action: function(req,res,next,name,file){
         if(acceptedImageTypes.includes(file['type']) || file['name'].includes('.png')){
-          file.path = kmlDir + "images/" + file.name
+          file.path = global.kml.kmlDir + "images/" + file.name
         }else if(kmlType.includes(file['type']) || file['name'].includes('.kml')){
-          file.path = kmlDir + file.name
+          file.path = global.kml.kmlDir + file.name
         }
     }
   }
@@ -44,8 +51,8 @@ lgKML.use(formidableMiddleware({
   keepExtensions: true,
 
 },events));
-
-lgKML.use('/',express.static(kmlDir));
+console.log(global.kml.kmlDir)
+lgKML.use('/',express.static(global.kml.kmlDir));
 
 lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -75,6 +82,7 @@ lgKML.post('/kml/builder/addplacemark',function(req,res){
   kmlMaster.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   kmlSlave.addPlacemark(data.id,data.name,data.longitude,data.latitude,data.range,'relativeToGround',data.description,data.icon,data.scale)
   updateKML().then( () => {
+      console.log('test')
       res.send({message: true})
     })
 })
@@ -293,6 +301,39 @@ lgKML.get('/kml/flyto/:longitude/:latitude/:range',function(req,res){
 
 })
 
+lgKML.get('/kml/query/search/:location', (req,res) => {
+  const text = `search="${location}"`
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    if(err){
+      console.log(err)
+    }
+    res.send({ message: 'Done' })
+  })
+} )
+lgKML.get('/kml/query/changePlanet/:planet', (req,res) => {
+  const text = `search="${planet}"`
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    if(err){
+      console.log(err)
+    }
+    res.send({ message: 'Done' })
+  })
+} )
+
+lgKML.get('/kml/query/flyto/:longitude/:latitude/:range',function(req,res){
+
+  var text = 'flytoview=<LookAt> <longitude>' + req.params.longitude +'</longitude><latitude>' + req.params.latitude + '</latitude><range>' + req.params.range + '</range></LookAt>'
+  fs.writeFile('/tmp/query.txt', text,function(err){
+    if(err){
+      console.log(err)
+    }
+  })
+  res.send({ message: 'Done' })
+
+})
+
+
+
 
 function changeCurrentByName(name){
   name = name.split('.kml')[0]
@@ -314,7 +355,7 @@ function changeCurrentByName(name){
 function checkFolder(){
   kmlList = []
   return new Promise ((resolve,reject) => {
-    fs.readdir(kmlDir, function (err, files) {
+    fs.readdir(global.kml.kmlDir, function (err, files) {
       files.forEach(function (file) {
         if(file.substr(-4) === '.kml') {
           addKML(file)
@@ -329,29 +370,18 @@ function addKML(kml){
   kmlList.push({
     'id'    : kmlList.length,
     'name'  : kml.split(".kml")[0],
-    'path'  : path.join(kmlDir,kml)
+    'path'  : path.join(global.kml.kmlDir,kml)
     })
 }
 
 function updateKML(){
   return new Promise(function(resolve, reject) {
-    Promise.all([kmlMaster.saveKML(kmlDir), kmlSlave.saveKML(kmlDir)])
+    Promise.all([kmlMaster.saveKML(global.kml.kmlDir), kmlSlave.saveKML(global.kml.kmlDir)])
       .then( (values) => {
         console.log('then')
         resolve() })
       .catch( (values) => { reject()})
   });
-  // kmlMaster.saveKML(kmlDir)
-  // .then(function(res){
-  //
-  //   joinKMLs(currentKmlMaster.path)
-  // })
-  // kmlSlave.saveKML(kmlDir)
-  // .then(function(res){
-  //   joinKMLs(currentKmlSlave.path)
-  //
-  // })
-
 }
 
 function startNewKml(name){
@@ -376,6 +406,8 @@ function joinKMLs(CurrentPath){
     }
   })
 }
+
+
 
 cleanScreen()
 /***
