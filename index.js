@@ -310,8 +310,8 @@ lgKML.get('/kml/query/search/:location', (req,res) => {
     res.send({ message: 'Done' })
   })
 } )
-lgKML.get('/kml/query/changePlanet/:planet', (req,res) => {
-  const text = `search="${planet}"`
+lgKML.get('/kml/query/planet/:planet', (req,res) => {
+  const text = `planet="${planet}"`
   fs.writeFile('/tmp/query.txt', text,function(err){
     if(err){
       console.log(err)
