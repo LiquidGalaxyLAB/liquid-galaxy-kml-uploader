@@ -5,6 +5,9 @@ const fs          = require('fs');
 const queryRoutes = require('./router/query')
 const viewRoutes  = require('./router/viewsync')
 
+const kmlWriter = require('kmlwriter')
+const kmlMaster = new kmlWriter()
+const kmlSlave = new kmlWriter()
 
 global.kml = {
   kmlList: [],
@@ -18,14 +21,6 @@ global.kml = {
 }
 
 
-var path2 = {a :'test'}
-
-
-
-
-var kmlWriter = require('kmlwriter')
-const kmlMaster = new kmlWriter()
-const kmlSlave = new kmlWriter()
 
 kmlMaster.startKml("initKmlMaster")
 kmlSlave.startKml("initKmlSlave")
@@ -64,15 +59,13 @@ lgKML.use( bodyParser.json() );       // to support JSON-encoded bodies
 lgKML.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }))
+
+
 lgKML.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
-
-// lgKML.use(bodyParser() );
-
 
 
 /***
@@ -140,6 +133,25 @@ lgKML.post('/kml/builder/addPhoto',function(req,res){
   res.send({ message : 'done' })
 })
 
+lgKML.post('/kml/builder/concatenate',function(req,res){
+  concatenate.push(req.files.kml.path)
+  // console.log(req.files.kml.path)
+  // fs.writeFile('./pre',out,function(err){
+    //   if(err){
+      //     console.log(err)
+      //   }
+      // })
+      updateKML()
+      res.send({message: 'done'})
+    })
+
+    lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
+      kmlMaster.deleteTagById(req.params.tag, req.params.id)
+      kmlSlave.deleteTagById(req.params.tag, req.params.id)
+      updateKML()
+      res.send({message: "done" })
+    })
+    
 lgKML.get('/kml/manage/stopTour',function(req,res){
   var text = 'exittour=true'
   fs.writeFile('/tmp/query.txt', text,function(err){
@@ -151,24 +163,6 @@ lgKML.get('/kml/manage/stopTour',function(req,res){
   res.send({message: 'done'})
 })
 
-lgKML.post('/kml/builder/concatenate',function(req,res){
-  concatenate.push(req.files.kml.path)
-  // console.log(req.files.kml.path)
-  // fs.writeFile('./pre',out,function(err){
-  //   if(err){
-  //     console.log(err)
-  //   }
-  // })
-  updateKML()
-  res.send({message: 'done'})
-})
-
-lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
-  kmlMaster.deleteTagById(req.params.tag, req.params.id)
-  kmlSlave.deleteTagById(req.params.tag, req.params.id)
-  updateKML()
-  res.send({message: "done" })
-})
 
 /***
 * KML Manage endpoints
@@ -231,10 +225,9 @@ lgKML.get('/kml/manage/balloon/:id/:newState',function(req,res){
 lgKML.get('/kml/manage/initTour/:name',function(req,res){
   var text = 'playtour=' + req.params.name
   fs.writeFile('/tmp/query.txt', text,function(err){
-  if(err){
-    console.log(err)
-  }
-
+    if(err){
+      console.log(err)
+    }
   })
   res.send({message: "done" })
 })
@@ -293,41 +286,6 @@ lgKML.get('/kml/flyto/:longitude/:latitude/:range',function(req,res){
 
 })
 
-// lgKML.get('/kml/query/search/:location', (req,res) => {
-//   const text = `search="${location}"`
-//   fs.writeFile('/tmp/query.txt', text,function(err){
-//     if(err){
-//       console.log(err)
-//     }
-//     res.send({ message: 'Done' })
-//   })
-// })
-//
-// lgKML.get('/kml/query/planet/:planet', (req,res) => {
-//   const text = `planet="${planet}"`
-//   fs.writeFile('/tmp/query.txt', text,function(err){
-//     if(err){
-//       console.log(err)
-//     }
-//     res.send({ message: 'Done' })
-//   })
-// })
-//
-// lgKML.get('/kml/query/flyto/:longitude/:latitude/:range',function(req,res){
-//
-//   var text = 'flytoview=<LookAt> <longitude>' + req.params.longitude +'</longitude><latitude>' + req.params.latitude + '</latitude><range>' + req.params.range + '</range></LookAt>'
-//   fs.writeFile('/tmp/query.txt', text,function(err){
-//     if(err){
-//       console.log(err)
-//     }
-//   })
-//   res.send({ message: 'Done' })
-//
-// })
-
-
-
-
 function changeCurrentByName(name){
   name = name.split('.kml')[0]
   checkFolder().then(function(){
@@ -373,8 +331,8 @@ function updateKML(){
   return new Promise(function(resolve, reject) {
     Promise.all([kmlMaster.saveKML(global.kml.kmlDir), kmlSlave.saveKML(global.kml.kmlDir)])
       .then( (values) => {
-        console.log('then')
-        resolve() })
+        resolve()
+      })
       .catch( (values) => { reject()})
   });
 }

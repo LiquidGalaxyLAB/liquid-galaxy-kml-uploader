@@ -24,7 +24,7 @@ class query {
         })
       })
       route.get('/planet/:planet', (req,res) => {
-        const text = `planet="${req.params.planet}"`
+        const text = `planet=${req.params.planet}`
         fs.writeFile('/tmp/query.txt', text,function(err){
           if(err){
             console.log(err)
