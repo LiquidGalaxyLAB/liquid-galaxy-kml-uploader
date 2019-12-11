@@ -8,14 +8,20 @@ const viewRoutes  = require('./router/viewsync')
 
 global.kml = {
   kmlList: [],
+  current: {
+    master: {},
+    slave: {}
+  },
   currentKmlSlave: {},
-  currentKmlMaster: {},
+  currentKmlMaster: {path: ''},
   kmlDir: path.join(require('os').homedir(),'/kmlApi/')
 }
 
 
+var path2 = {a :'test'}
 
-lgKML.use('/kml/viewsync/',viewRoutes)
+
+
 
 var kmlWriter = require('kmlwriter')
 const kmlMaster = new kmlWriter()
@@ -170,6 +176,7 @@ lgKML.delete('/kml/builder/deleteTag/:tag/:id',function(req,res){
 lgKML.post('/kml/manage/new',function(req,res){
   startNewKml(req.query.name)
   updateKML()
+  console.log(req.query.name)
   checkFolder().then(() => {
     changeCurrentByName(req.query.name)
     res.send({list: global.kml.kmlList})
@@ -196,9 +203,9 @@ function cleanScreen(){
     checkFolder().then(function(){
       global.kml.kmlList.forEach(function(data,index){
         if(data.name.includes('initKmlMaster')){
-          global.kml.currentKmlMaster = global.kml.kmlList[index]
+          global.kml.current.master =  global.kml.kmlList[index]
         }else if(data.name.includes('initKmlSlave')){
-          global.kml.currentKmlSlave = global.kml.kmlList[index]
+          global.kml.current.slave = global.kml.kmlList[index]
         }
       })
     })
@@ -326,10 +333,12 @@ function changeCurrentByName(name){
   checkFolder().then(function(){
     global.kml.kmlList.forEach(function(data,index){
       if(data.name.includes(name)){
-        global.kml.currentKmlMaster = global.kml.kmlList[index]
+        global.kml.currentKmlMaster = JSON.parse(JSON.stringify(global.kml.kmlList[index]))
+        console.log('5')
         global.kml.currentKmlSlave = global.kml.kmlList[index]
       }
     })
+
   })
   joinKMLs(global.kml.currentKmlMaster.path)
   joinKMLs(global.kml.currentKmlSlave.path)
@@ -394,8 +403,8 @@ function joinKMLs(CurrentPath){
 }
 
 
-
 cleanScreen()
+lgKML.use('/kml/viewsync/',new viewRoutes(global.kml.current).router())
 /***
 *export
 **/
