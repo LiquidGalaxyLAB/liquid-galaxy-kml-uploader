@@ -293,37 +293,37 @@ lgKML.get('/kml/flyto/:longitude/:latitude/:range',function(req,res){
 
 })
 
-lgKML.get('/kml/query/search/:location', (req,res) => {
-  const text = `search="${location}"`
-  fs.writeFile('/tmp/query.txt', text,function(err){
-    if(err){
-      console.log(err)
-    }
-    res.send({ message: 'Done' })
-  })
-})
-
-lgKML.get('/kml/query/planet/:planet', (req,res) => {
-  const text = `planet="${planet}"`
-  fs.writeFile('/tmp/query.txt', text,function(err){
-    if(err){
-      console.log(err)
-    }
-    res.send({ message: 'Done' })
-  })
-})
-
-lgKML.get('/kml/query/flyto/:longitude/:latitude/:range',function(req,res){
-
-  var text = 'flytoview=<LookAt> <longitude>' + req.params.longitude +'</longitude><latitude>' + req.params.latitude + '</latitude><range>' + req.params.range + '</range></LookAt>'
-  fs.writeFile('/tmp/query.txt', text,function(err){
-    if(err){
-      console.log(err)
-    }
-  })
-  res.send({ message: 'Done' })
-
-})
+// lgKML.get('/kml/query/search/:location', (req,res) => {
+//   const text = `search="${location}"`
+//   fs.writeFile('/tmp/query.txt', text,function(err){
+//     if(err){
+//       console.log(err)
+//     }
+//     res.send({ message: 'Done' })
+//   })
+// })
+//
+// lgKML.get('/kml/query/planet/:planet', (req,res) => {
+//   const text = `planet="${planet}"`
+//   fs.writeFile('/tmp/query.txt', text,function(err){
+//     if(err){
+//       console.log(err)
+//     }
+//     res.send({ message: 'Done' })
+//   })
+// })
+//
+// lgKML.get('/kml/query/flyto/:longitude/:latitude/:range',function(req,res){
+//
+//   var text = 'flytoview=<LookAt> <longitude>' + req.params.longitude +'</longitude><latitude>' + req.params.latitude + '</latitude><range>' + req.params.range + '</range></LookAt>'
+//   fs.writeFile('/tmp/query.txt', text,function(err){
+//     if(err){
+//       console.log(err)
+//     }
+//   })
+//   res.send({ message: 'Done' })
+//
+// })
 
 
 
@@ -405,6 +405,8 @@ function joinKMLs(CurrentPath){
 
 cleanScreen()
 lgKML.use('/kml/viewsync/',new viewRoutes(global.kml.current).router())
+lgKML.use('/kml/query/',new queryRoutes(global.kml.current).router())
+
 /***
 *export
 **/

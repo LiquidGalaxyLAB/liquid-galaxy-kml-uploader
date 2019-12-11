@@ -9,7 +9,6 @@ class view {
 
     router() {
       const route = express.Router()
-
       route.get('/slave',(req,res) => {
         res.setHeader('Content-Type', 'text/xml')
 
