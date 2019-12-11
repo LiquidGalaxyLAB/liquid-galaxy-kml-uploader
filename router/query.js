@@ -18,8 +18,9 @@ class query {
         fs.writeFile('/tmp/query.txt', text,function(err){
           if(err){
             console.log(err)
-            res.send({ message: 'Done' })
+            res.status(500).send({msg: 'internal error'})
           }
+          res.send({ message: 'Done' })
         })
       })
       route.get('/planet/:planet', (req,res) => {
@@ -27,8 +28,9 @@ class query {
         fs.writeFile('/tmp/query.txt', text,function(err){
           if(err){
             console.log(err)
-            res.send({ message: 'Done' })
+            res.status(500).send({msg: 'internal error'})
           }
+          res.send({ message: 'Done' })
         })
       })
       route.get('/flyto/:longitude/:latitude/:range',function(req,res){
@@ -36,8 +38,9 @@ class query {
         fs.writeFile('/tmp/query.txt', text,function(err){
           if(err){
             console.log(err)
-            res.send({ message: 'Done' })
+            res.status(500).send({msg: 'internal error'})
           }
+          res.send({ message: 'Done' })
         })
       })
 

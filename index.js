@@ -405,7 +405,7 @@ function joinKMLs(CurrentPath){
 
 cleanScreen()
 lgKML.use('/kml/viewsync/',new viewRoutes(global.kml.current).router())
-lgKML.use('/kml/query/',new queryRoutes(global.kml.current).router())
+lgKML.use('/kml/query/',new queryRoutes().router())
 
 /***
 *export
