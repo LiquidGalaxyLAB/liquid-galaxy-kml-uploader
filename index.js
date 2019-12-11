@@ -1,18 +1,21 @@
-const express   = require("express")
-let path        = require('path');
-const lgKML     = express.Router();
-let fs          = require('fs');
+const express     = require("express")
+const path        = require('path');
+const lgKML       = express.Router();
+const fs          = require('fs');
+const queryRoutes = require('./router/query')
+const viewRoutes  = require('./router/viewsync')
+
 
 global.kml = {
   kmlList: [],
-  currentKmlMaster: {},
+  currentKmlSlave: {},
   currentKmlMaster: {},
   kmlDir: path.join(require('os').homedir(),'/kmlApi/')
 }
 
 
 
-
+lgKML.use('/kml/viewsync/',viewRoutes)
 
 var kmlWriter = require('kmlwriter')
 const kmlMaster = new kmlWriter()
@@ -22,9 +25,6 @@ kmlMaster.startKml("initKmlMaster")
 kmlSlave.startKml("initKmlSlave")
 updateKML()
 
-var kmlList = []
-var currentKmlMaster = {};
-var currentKmlSlave = {};
 var concatenate = [];
 
 var exec = require('child_process').exec;
@@ -172,45 +172,45 @@ lgKML.post('/kml/manage/new',function(req,res){
   updateKML()
   checkFolder().then(() => {
     changeCurrentByName(req.query.name)
-    res.send({list: kmlList})
+    res.send({list: global.kml.kmlList})
   })
 })
 
 lgKML.get('/kml/manage/current',function(req,res){
-  res.send({current: currentKmlSlave})
+  res.send({current: global.kml.currentKmlMaster})
 })
 
 lgKML.get('/kml/manage/list',function(req,res){
-  res.send({list: kmlList})
+  res.send({list: global.kml.kmlList})
 })
 lgKML.get('/kml/manage/clean',function(req,res){
   kmlMaster.startKml("initKmlMaster")
   kmlSlave.startKml("initKmlSlave")
   updateKML()
   cleanScreen()
-  res.send({current: currentKmlMaster})
+  res.send({current: global.kml.currentKmlMaster})
 })
 
 function cleanScreen(){
     concatenate = []
     checkFolder().then(function(){
-      kmlList.forEach(function(data,index){
+      global.kml.kmlList.forEach(function(data,index){
         if(data.name.includes('initKmlMaster')){
-          currentKmlMaster = kmlList[index]
+          global.kml.currentKmlMaster = global.kml.kmlList[index]
         }else if(data.name.includes('initKmlSlave')){
-          currentKmlSlave = kmlList[index]
+          global.kml.currentKmlSlave = global.kml.kmlList[index]
         }
       })
     })
 }
 
 lgKML.put('/kml/manage/:id',function(req,res){
-  currentKml = kmlList[req.params.id]
+  currentKml = global.kml.kmlList[req.params.id]
   res.send({message: "done" })
 })
 lgKML.put('/kml/manage',function(req,res){
   checkFolder().then(() => {
-    res.send(kmlList)
+    res.send(global.kml.kmlList)
   })
 })
 
@@ -233,31 +233,28 @@ lgKML.get('/kml/manage/initTour/:name',function(req,res){
 })
 
 lgKML.delete('/kml/manage/:id',function(req,res){
-  if(kmlList.length > 0){
-    fs.unlink(kmlList[req.params.id].path,function(err){
+  if(global.kml.kmlList.length > 0){
+    fs.unlink(global.kml.kmlList[req.params.id].path,function(err){
       console.log(err)
     })
     checkFolder()
     .then(() => {
-      res.send(kmlList)
+      res.send(global.kml.kmlList)
     })
   }else{
-    res.send(kmlList)
+    res.send(global.kml.kmlList)
   }
 
 })
 
-/****
-*
-****/
 lgKML.post('/kml/manage/upload/',function(req,res){
   var kml = req.files.kml
   checkFolder()
   .then(() => {
     changeCurrentByName(kml.name)
-    // joinKMLs(currentKmlMaster.path)
-    // joinKMLs(currentKmlSlave.path)
-    res.send({message: "done", List: kmlList})
+    // joinKMLs(global.kml.currentKmlSlave.path)
+    // joinKMLs(global.kml.currentKmlSlave.path)
+    res.send({message: "done", List: global.kml.kmlList})
   })
   .catch((err) =>{
     console.log(err)
@@ -266,18 +263,6 @@ lgKML.post('/kml/manage/upload/',function(req,res){
 })
 
 
-
-/****
-* the endpoint to sync the kml
-****/
-lgKML.get('/kml/viewsync/slave',function(req,res){
-  res.setHeader('Content-Type', 'text/xml')
-  res.sendFile(currentKmlSlave.path)
-})
-lgKML.get('/kml/viewsync/master',function(req,res){
-  res.setHeader('Content-Type', 'text/xml')
-  res.sendFile(currentKmlMaster.path)
-})
 
 /***
 * exec the scripts
@@ -309,7 +294,8 @@ lgKML.get('/kml/query/search/:location', (req,res) => {
     }
     res.send({ message: 'Done' })
   })
-} )
+})
+
 lgKML.get('/kml/query/planet/:planet', (req,res) => {
   const text = `planet="${planet}"`
   fs.writeFile('/tmp/query.txt', text,function(err){
@@ -318,7 +304,7 @@ lgKML.get('/kml/query/planet/:planet', (req,res) => {
     }
     res.send({ message: 'Done' })
   })
-} )
+})
 
 lgKML.get('/kml/query/flyto/:longitude/:latitude/:range',function(req,res){
 
@@ -338,22 +324,22 @@ lgKML.get('/kml/query/flyto/:longitude/:latitude/:range',function(req,res){
 function changeCurrentByName(name){
   name = name.split('.kml')[0]
   checkFolder().then(function(){
-    kmlList.forEach(function(data,index){
+    global.kml.kmlList.forEach(function(data,index){
       if(data.name.includes(name)){
-        currentKmlMaster = kmlList[index]
-        currentKmlSlave = kmlList[index]
+        global.kml.currentKmlMaster = global.kml.kmlList[index]
+        global.kml.currentKmlSlave = global.kml.kmlList[index]
       }
     })
   })
-  joinKMLs(currentKmlMaster.path)
-  joinKMLs(currentKmlSlave.path)
+  joinKMLs(global.kml.currentKmlMaster.path)
+  joinKMLs(global.kml.currentKmlSlave.path)
 
 
 }
 
 //suport functions
 function checkFolder(){
-  kmlList = []
+  global.kml.kmlList = []
   return new Promise ((resolve,reject) => {
     fs.readdir(global.kml.kmlDir, function (err, files) {
       files.forEach(function (file) {
@@ -367,8 +353,8 @@ function checkFolder(){
 }
 
 function addKML(kml){
-  kmlList.push({
-    'id'    : kmlList.length,
+  global.kml.kmlList.push({
+    'id'    : global.kml.kmlList.length,
     'name'  : kml.split(".kml")[0],
     'path'  : path.join(global.kml.kmlDir,kml)
     })
